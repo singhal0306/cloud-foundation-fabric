@@ -20,9 +20,12 @@ variable "agent_config" {
     agent_name = optional(string, "Test Agent on GCP")
     image      = optional(string, "azp-agent")
     azp = object({
-      instance   = string
-      pool       = string
-      token_file = optional(string)
+      instance = string
+      pool     = string
+      token = optional(object({
+        file    = string
+        version = optional(number, 1)
+      }))
     })
   })
 }
@@ -37,7 +40,8 @@ variable "instance_config" {
       subnetwork = string
     })
   })
-  nullable = false
+  nullable = true
+  default  = null
 }
 
 variable "location" {

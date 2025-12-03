@@ -25,9 +25,10 @@ output "docker_registry" {
 
 output "ssh_command" {
   description = "Command to SSH to the agent instance."
-  value = nonsensitive(
-    "gcloud compute ssh ${module.agent.instance.name} --zone ${module.agent.instance.zone} --project ${var.project_id}"
-  )
+  value = nonsensitive(try(
+    "gcloud compute ssh ${module.agent[0].instance.name} --zone ${module.agent[0].instance.zone} --project ${var.project_id}",
+    null
+  ))
 }
 
 output "vpcsc_command" {

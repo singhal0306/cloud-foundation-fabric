@@ -37,7 +37,6 @@ module "registry" {
 
 module "secret" {
   source     = "../../../modules/secret-manager"
-  count      = var.agent_config.azp.token_file == null ? 0 : 1
   project_id = var.project_id
   secrets = {
     (var.name) = {
@@ -47,11 +46,10 @@ module "secret" {
         ]
       }
       versions = {
-        latest = {
-          data = file(var.agent_config.azp.token_file)
+        "v-${var.agent_config.azp.token.version}" = {
+          data = try(file(var.agent_config.azp.token.file), null)
           data_config = {
-            # bump this version when data needs updating
-            write_only_version = 1
+            write_only_version = var.agent_config.azp.token.version
           }
         }
       }
@@ -61,6 +59,7 @@ module "secret" {
 
 module "agent" {
   source        = "../../../modules/compute-vm"
+  count         = var.instance_config == null ? 0 : 1
   project_id    = var.project_id
   zone          = "${var.location}-${var.instance_config.zone}"
   name          = "${var.name}-agent"
